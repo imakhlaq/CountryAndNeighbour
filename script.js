@@ -70,7 +70,7 @@ const getContryDataWithNeibor = function (country2) {
       const [data] = e;
       renderData(data);
 
-      //////
+      ////// loading border contries
 
       if (!data.borders) return;
 
@@ -97,12 +97,16 @@ search.addEventListener('submit', function (e) {
   getContryDataWithNeibor(country2);
 });
 
-const whereAmI = function (lat, lng) {
-  fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
-    .then(e => {
-      if (e.ok) throw new Error('no response');
-      return e.json();
-    })
-    .then(e => console.log(e));
+// promisefying jio location Api which is an asyc
+
+const currlocation = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(
+      e => resolve(e),
+      () => reject(new Error('user denide acces'))
+    );
+  });
 };
-whereAmI(51.50354, -0.12768);
+currlocation()
+  .then(e => console.log(e))
+  .catch(err => console.log(err));
