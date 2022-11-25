@@ -7,7 +7,6 @@ const search = document.querySelector('form');
 
 ///////////////////////////////////////
 const renderData = function (data, classname = ``) {
-  console.log(data);
   const html = `
       <article class="country ${classname}">
           <img class="country__img" src="${data.flags.svg}" />
@@ -29,37 +28,64 @@ const renderData = function (data, classname = ``) {
   countriesContainer.style.opacity = '1';
 };
 
-const getneibors = function (country3) {
-  const requestNei = new XMLHttpRequest();
-  requestNei.open('GET', `https://restcountries.com/v2/alpha/${country3}`);
-  requestNei.send();
+// const getneibors = function (country3) {
+//   const requestNei = new XMLHttpRequest();
+//   requestNei.open('GET', `https://restcountries.com/v2/alpha/${country3}`);
+//   requestNei.send();
 
-  //
-  requestNei.addEventListener('load', function () {
-    const neiData = JSON.parse(requestNei.responseText);
-    renderData(neiData, 'neighbour');
-  });
+//   //
+//   requestNei.addEventListener('load', function () {
+//     const neiData = JSON.parse(requestNei.responseText);
+//     renderData(neiData, 'neighbour');
+//   });
+// };
+// const getContryDataWithNeibor = function (country) {
+//   const request = new XMLHttpRequest();
+//   //creating connection
+//   request.open('GET', `https://restcountries.com/v2/name/${country}`);
+//   //requesting data
+//   request.send();
+//   //waiting for data
+
+//   request.addEventListener('load', function () {
+//     const [data] = JSON.parse(this.responseText);
+//     renderData(data);
+
+//     //requesting for neibhor country
+
+//     //this is call back hell
+//     if (!data.borders) return;
+
+//     data.borders.forEach(c => getneibors(c));
+//   });
+// };
+
+const getContryDataWithNeibor = function (country2) {
+  fetch(`https://restcountries.com/v2/name/${country2}`)
+    .then(e => {
+      if (!e.ok) throw new Error('country not found');
+      return e.json();
+    })
+    .then(e => {
+      const [data] = e;
+      renderData(data);
+
+      //////
+
+      if (!data.borders) return;
+
+      data.borders.forEach(nei => {
+        fetch(`https://restcountries.com/v2/alpha/${nei}`)
+          .then(e => {
+            if (!e.ok) throw new Error('Invalid country');
+            return e.json();
+          })
+          .then(e => renderData(e));
+      });
+    })
+    .catch(err => console.log(`${err.message}`));
 };
-const getContryDataWithNeibor = function (country) {
-  const request = new XMLHttpRequest();
-  //creating connection
-  request.open('GET', `https://restcountries.com/v2/name/${country}`);
-  //requesting data
-  request.send();
-  //waiting for data
 
-  request.addEventListener('load', function () {
-    const [data] = JSON.parse(this.responseText);
-    renderData(data);
-
-    //requesting for neibhor country
-
-    //this is call back hell
-    if (!data.borders) return;
-
-    data.borders.forEach(c => getneibors(c));
-  });
-};
 const removeprevious = function () {
   countriesContainer.innerHTML = '';
 };
@@ -70,3 +96,13 @@ search.addEventListener('submit', function (e) {
 
   getContryDataWithNeibor(country2);
 });
+
+const whereAmI = function (lat, lng) {
+  fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
+    .then(e => {
+      if (e.ok) throw new Error('no response');
+      return e.json();
+    })
+    .then(e => console.log(e));
+};
+whereAmI(51.50354, -0.12768);
