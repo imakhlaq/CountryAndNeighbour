@@ -110,3 +110,29 @@ const currlocation = function () {
 currlocation()
   .then(e => console.log(e))
   .catch(err => console.log(err));
+
+//challenge 2
+//wait
+const wait = function (seconds) {
+  return new Promise(resolve => {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+let b;
+const imgPromise = function (src) {
+  return new Promise((resolve, reject) => {
+    resolve(src);
+    reject(new Error('img not sound'));
+  });
+};
+
+imgPromise(`img/img-1.jpg`)
+  .then(e => {
+    const html = `<img src="${e}" >`;
+    b = document.querySelector('.images');
+    b.insertAdjacentHTML('afterbegin', html);
+    return wait(2);
+  })
+  .then(e => (b.style.display = 'none'))
+  .catch(err => console.log(err));
