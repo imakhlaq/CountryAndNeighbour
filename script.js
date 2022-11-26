@@ -113,26 +113,69 @@ currlocation()
 
 //challenge 2
 //wait
+
+// let b;
+// const imgPromise = function (src) {
+//   return new Promise((resolve, reject) => {
+//     resolve(src);
+//     reject(new Error('img not sound'));
+//   });
+// };
+
+// imgPromise(`img/img-1.jpg`)
+//   .then(e => {
+//     const html = `<img src="${e}" >`;
+//     b = document.querySelector('.images');
+//     b.insertAdjacentHTML('afterbegin', html);
+//     return wait(2);
+//   })
+//   .then(e => (b.style.display = 'none'))
+//   .catch(err => console.log(err));
+
 const wait = function (seconds) {
   return new Promise(resolve => {
     setTimeout(resolve, seconds * 1000);
   });
 };
 
-let b;
-const imgPromise = function (src) {
+const imgPromise = function (url) {
   return new Promise((resolve, reject) => {
-    resolve(src);
-    reject(new Error('img not sound'));
+    const img = document.createElement('img');
+    const imgContainer = document.querySelector('.images');
+
+    img.src = url;
+
+    img.addEventListener('load', () => {
+      imgContainer.appendChild(img);
+      resolve(img);
+    });
+
+    img.addEventListener('error', () => {
+      reject(new Error('Invalid Path'));
+    });
   });
 };
 
-imgPromise(`img/img-1.jpg`)
-  .then(e => {
-    const html = `<img src="${e}" >`;
-    b = document.querySelector('.images');
-    b.insertAdjacentHTML('afterbegin', html);
-    return wait(2);
-  })
-  .then(e => (b.style.display = 'none'))
-  .catch(err => console.log(err));
+const repromise = async function (url, url2) {
+  try {
+    //first img
+    let img = await imgPromise(url);
+    await wait(2);
+    img.style.display = 'none';
+
+    //second img
+    img = await imgPromise(url2);
+    img.style.display = 'none';
+    await wait(2);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+repromise('img/img-1.jpg', 'img/img-1.jpg');
+
+
+
+async function loadAll(imgArr){
+  imgArr.map((img)=>)
+}
